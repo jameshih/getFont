@@ -21,7 +21,7 @@ export default function Home() {
         const extensions = Object.keys(checked).filter((key) => checked[key]);
 
         if (inputVal.trim().length > 0 && extensions.length > 0)
-            search({ filename: inputVal.trim(), extensions });
+            search({ filename: inputVal.toLowerCase().replace('font', '').trim(), extensions });
     }
 
     function handleCheck(e: any) {
