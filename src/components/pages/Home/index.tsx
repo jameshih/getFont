@@ -27,11 +27,21 @@ export default function Home() {
     function handleSearchClick(e: any) {
         e.preventDefault();
         search(inputVal);
+        analytics.sendEvent({
+            category: 'User',
+            action: 'Search Icon Click',
+            label: inputVal,
+        });
     }
 
     function handleOnClick(e: any) {
         e.preventDefault();
         setInputVal('');
+        analytics.sendEvent({
+            category: 'User',
+            action: 'Clear Search',
+            label: inputVal,
+        });
     }
 
     function search(filename: string) {
@@ -88,6 +98,12 @@ export default function Home() {
                         type='text'
                         value={inputVal}
                         onChange={handleChange}
+                        onClick={() => {
+                            analytics.sendEvent({
+                                category: 'User',
+                                action: 'Search Bar Click',
+                            });
+                        }}
                         placeholder='Search Font Name'
                     />
                 </div>
