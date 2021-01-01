@@ -85,7 +85,7 @@ export default function Home() {
             </div>
             {loading && <div className='mt-8'>Searching...</div>}
             {searchResult.length > 0 && (
-                <div className='mt-8'>
+                <div className='my-8'>
                     {searchResult.map((elm: any, index: number) => (
                         <div className='mt-4' key={elm.name + elm.repository.id + index}>
                             <a href={`${elm.html_url.replace('/blob/', '/raw/')}`}>{elm.name}</a>
