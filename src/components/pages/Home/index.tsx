@@ -54,7 +54,7 @@ export default function Home() {
     }
 
     return (
-        <div className='pt-24 lg:w-1/2 lg:mx-auto'>
+        <div className='px-4 pt-24 lg:px-0 lg:w-1/2 lg:mx-auto'>
             <div className='flex justify-between'>
                 <input
                     className='w-3/5 pl-4 border border-gray-700'
