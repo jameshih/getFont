@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useDebounce from '../../../hooks/useDebounce';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
     const [options] = useState(['otf', 'ttf', 'woff', 'woff2', 'eot']);
     const [loading, setLoading] = useState(false);
-    const [searchResult, setSearchResult] = useState([]);
+    const [searchResult, setSearchResult] = useState<any>([]);
     const [inputVal, setInputVal] = useState('');
     const [checked, setChecked] = useState<any>({
         otf: true,
@@ -16,58 +19,87 @@ export default function Home() {
         setInputVal(e.target.value);
     }
 
-    function handleClick(e: any) {
-        e.preventDefault();
-        const extensions = Object.keys(checked).filter((key) => checked[key]);
-
-        if (inputVal.trim().length > 0 && extensions.length > 0)
-            search({ filename: inputVal.toLowerCase().replace('font', '').trim(), extensions });
-    }
-
     function handleCheck(e: any) {
         const key = e.target.value;
         setChecked((prev: any) => Object.assign(prev, { [key]: !checked[key] }));
     }
 
-    function search(params: { filename: string; extensions: any }) {
-        setLoading(true);
-        const extensionsString =
-            params.extensions.length > 0
-                ? `+extension:${params.extensions.join('+extension:')}`
-                : '';
-        const query = `https://api.github.com/search/code?q=+filename:${params.filename}${extensionsString}&page=1`;
-        const headers = new Headers({
-            Authorization: 'Token ' + process.env.REACT_APP_ACCESS_TOKEN,
-            'Content-Type': 'application/x-www-form-urlencoded',
-        });
-
-        fetch(query, {
-            headers,
-            method: 'GET',
-        })
-            .then((res) => res.json())
-            .then(({ items }) => {
-                setSearchResult(items);
-                setLoading(false);
-            })
-            .catch((err) => console.log(err));
+    function handleSearchClick(e: any) {
+        e.preventDefault();
+        search(inputVal);
     }
 
+    function handleOnClick(e: any) {
+        e.preventDefault();
+        setInputVal('');
+    }
+
+    function search(filename: string) {
+        const extensions = Object.keys(checked).filter((key) => checked[key]);
+        filename = filename.toLowerCase().replace('font', '').trim();
+        if (filename.length && extensions.length) {
+            setLoading(true);
+            const extensionsString = extensions.length
+                ? `+extension:${extensions.join('+extension:')}`
+                : '';
+            const query = `https://api.github.com/search/code?q=+filename:${filename}${extensionsString}&page=1`;
+            const headers = new Headers({
+                Authorization: 'Token ' + process.env.REACT_APP_ACCESS_TOKEN,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            });
+
+            fetch(query, {
+                headers,
+                method: 'GET',
+            })
+                .then((res) => res.json())
+                .then(({ items }) => {
+                    items.length ? setSearchResult(items) : setSearchResult(['none']);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setLoading(false);
+                });
+        }
+    }
+
+    const debouncedSearchTerm = useDebounce(inputVal, 500);
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            search(debouncedSearchTerm);
+        }
+    }, [debouncedSearchTerm]);
+
     return (
-        <div className='px-4 pt-24 lg:px-0 lg:w-1/2 lg:mx-auto'>
-            <div className='flex justify-between'>
-                <input
-                    className='w-3/5 pl-4 border border-gray-700'
-                    type='text'
-                    value={inputVal}
-                    onChange={handleChange}
-                    placeholder='font name'
-                />
-                <button className='w-1/3 border border-gray-800' onClick={handleClick}>
-                    Search
-                </button>
+        <div className='px-4 pt-4 lg:pt-24 lg:px-0 lg:w-1/2 lg:mx-auto'>
+            <div className='flex w-full px-8 py-4 bg-white border rounded-full justify-evenly'>
+                <div className='w-2/3'>
+                    <input
+                        className='w-full focus:outline-none'
+                        type='text'
+                        value={inputVal}
+                        onChange={handleChange}
+                        placeholder='Search Font Name'
+                    />
+                </div>
+
+                <div className='w-1/3 text-right'>
+                    {inputVal && (
+                        <span className='text-gray-500 ' onClick={handleOnClick}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </span>
+                    )}
+                    <span
+                        className='pl-8 ml-8 border-l-2 cursor-pointer'
+                        onClick={handleSearchClick}
+                    >
+                        <FontAwesomeIcon icon={faSearch} />
+                    </span>
+                </div>
             </div>
-            <div className='flex mt-4 bg-gray-100 justify-evenly'>
+            <div className='flex mt-4 text-xl justify-evenly'>
                 {options.map((elm, index) => (
                     <div key={index}>
                         <input
@@ -83,8 +115,11 @@ export default function Home() {
                     </div>
                 ))}
             </div>
-            {loading && <div className='mt-8'>Searching...</div>}
-            {searchResult.length > 0 && (
+            {loading ? (
+                <div className='mt-8'>Searching...</div>
+            ) : searchResult[0] === 'none' ? (
+                <div className='mt-8'>No font found</div>
+            ) : searchResult.length > 0 ? (
                 <div className='my-8'>
                     {searchResult.map((elm: any, index: number) => (
                         <div className='mt-4' key={elm.name + elm.repository.id + index}>
@@ -92,7 +127,7 @@ export default function Home() {
                         </div>
                     ))}
                 </div>
-            )}
+            ) : null}
         </div>
     );
 }
