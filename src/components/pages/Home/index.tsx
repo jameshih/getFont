@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import useDebounce from '../../../hooks/useDebounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faSearch } from '@fortawesome/free-solid-svg-icons';
+import * as analytics from '../../../hooks/analytics';
 
 export default function Home() {
-    const [options] = useState(['otf', 'ttf', 'woff', 'woff2', 'eot']);
     const [loading, setLoading] = useState(false);
     const [searchResult, setSearchResult] = useState<any>([]);
     const [inputVal, setInputVal] = useState('');
@@ -42,6 +42,7 @@ export default function Home() {
             const extensionsString = extensions.length
                 ? `+extension:${extensions.join('+extension:')}`
                 : '';
+
             const query = `https://api.github.com/search/code?q=+filename:${filename}${extensionsString}&page=1`;
             const headers = new Headers({
                 Authorization: 'Token ' + process.env.REACT_APP_ACCESS_TOKEN,
@@ -61,6 +62,12 @@ export default function Home() {
                     console.log(err);
                     setLoading(false);
                 });
+
+            analytics.sendEvent({
+                category: 'User',
+                action: 'Search',
+                label: `${filename}${extensionsString}`,
+            });
         }
     }
 
@@ -100,7 +107,7 @@ export default function Home() {
                 </div>
             </div>
             <div className='flex mt-4 text-xl justify-evenly'>
-                {options.map((elm, index) => (
+                {Object.keys(checked).map((elm, index) => (
                     <div key={index}>
                         <input
                             type='checkbox'
@@ -123,7 +130,18 @@ export default function Home() {
                 <div className='my-8'>
                     {searchResult.map((elm: any, index: number) => (
                         <div className='mt-4' key={elm.name + elm.repository.id + index}>
-                            <a href={`${elm.html_url.replace('/blob/', '/raw/')}`}>{elm.name}</a>
+                            <a
+                                onClick={() => {
+                                    analytics.sendEvent({
+                                        category: 'User',
+                                        action: 'Font Click',
+                                        label: elm.html_url,
+                                    });
+                                }}
+                                href={`${elm.html_url.replace('/blob/', '/raw/')}`}
+                            >
+                                {elm.name}
+                            </a>
                         </div>
                     ))}
                 </div>
