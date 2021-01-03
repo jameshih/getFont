@@ -36,12 +36,12 @@ export default function Home() {
 
     function handleOnClick(e: any) {
         e.preventDefault();
-        setInputVal('');
         analytics.sendEvent({
             category: 'User',
             action: 'Clear Search',
-            label: inputVal,
+            label: `[clear] ${inputVal}`,
         });
+        setInputVal('');
     }
 
     function search(filename: string) {
