@@ -622,6 +622,9 @@ body {
   --bg-opacity: 1;
   background-color: #F2F2F2;
   background-color: rgba(242, 242, 242, var(--bg-opacity));
+  --text-opacity: 1;
+  color: #1a202c;
+  color: rgba(26, 32, 44, var(--text-opacity));
 }
 
 .space-y-0 > :not(template) ~ :not(template) {

@@ -93,7 +93,7 @@ export default function Home() {
 
     return (
         <div className='px-4 pt-4 lg:pt-24 lg:px-0 lg:w-1/2 lg:mx-auto'>
-            <div className='flex w-full px-8 py-4 bg-white shadow-md rounded-full justify-evenly'>
+            <div className='flex w-full px-8 py-4 bg-white rounded-full shadow-md justify-evenly'>
                 <div className='w-2/3'>
                     <input
                         className='w-full focus:outline-none'
@@ -176,6 +176,17 @@ export default function Home() {
                             <span className='w-4/5 text-lg font-medium'>{elm.name}</span>
                         </a>
                     ))}
+                    <i className='block mt-8 text-sm text-center font-light'>
+                        {'Dev by '}
+                        <a href='https://jameshih.com' className='underline'>
+                            James
+                        </a>
+                        . {'Art by '}
+                        <a href='https://www.instagram.com/kkmura_dot_net/' className='underline'>
+                            Kenta
+                        </a>
+                        .
+                    </i>
                 </div>
             ) : null}
         </div>
