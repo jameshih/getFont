@@ -3,4 +3,8 @@
 @tailwind components;
 /* purgecss end ignore */
 
+body {
+    @apply bg-app_white;
+}
+
 @tailwind utilities;

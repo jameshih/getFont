@@ -3,6 +3,7 @@ import useDebounce from '../../../hooks/useDebounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faSearch } from '@fortawesome/free-solid-svg-icons';
 import * as analytics from '../../../hooks/analytics';
+import Gif from '../../../assets/searching.gif';
 
 export default function Home() {
     const [loading, setLoading] = useState(false);
@@ -66,6 +67,7 @@ export default function Home() {
                 .then((res) => res.json())
                 .then(({ items }) => {
                     items.length ? setSearchResult(items) : setSearchResult(['none']);
+                    console.log(items);
                     setLoading(false);
                 })
                 .catch((err) => {
@@ -91,7 +93,7 @@ export default function Home() {
 
     return (
         <div className='px-4 pt-4 lg:pt-24 lg:px-0 lg:w-1/2 lg:mx-auto'>
-            <div className='flex w-full px-8 py-4 bg-white border rounded-full justify-evenly'>
+            <div className='flex w-full px-8 py-4 bg-white shadow-md rounded-full justify-evenly'>
                 <div className='w-2/3'>
                     <input
                         className='w-full focus:outline-none'
@@ -139,26 +141,40 @@ export default function Home() {
                 ))}
             </div>
             {loading ? (
-                <div className='mt-8'>Searching...</div>
+                <div className='flex items-center justify-center h-64 mt-8'>
+                    <div className='text-center'>
+                        <img src={Gif} className='w-32 rounded-full' alt='Searching icon' />
+                        <i className='block mt-2'>Searching...</i>
+                    </div>
+                </div>
             ) : searchResult[0] === 'none' ? (
-                <div className='mt-8'>No font found</div>
+                <div className='flex items-center justify-center h-64 mt-8'>
+                    <div className='text-center'>No font found</div>
+                </div>
             ) : searchResult.length > 0 ? (
                 <div className='my-8'>
                     {searchResult.map((elm: any, index: number) => (
-                        <div className='mt-4' key={elm.name + elm.repository.id + index}>
-                            <a
-                                onClick={() => {
-                                    analytics.sendEvent({
-                                        category: 'User',
-                                        action: 'Font Click',
-                                        label: elm.html_url,
-                                    });
-                                }}
-                                href={`${elm.html_url.replace('/blob/', '/raw/')}`}
-                            >
-                                {elm.name}
-                            </a>
-                        </div>
+                        <a
+                            key={elm.name + elm.repository.id + index}
+                            className='flex items-center justify-between p-4 mt-4 border rounded-lg shadow-md'
+                            onClick={() => {
+                                analytics.sendEvent({
+                                    category: 'User',
+                                    action: 'Font Click',
+                                    label: elm.html_url,
+                                });
+                            }}
+                            href={`${elm.html_url.replace('/blob/', '/raw/')}`}
+                        >
+                            <div className='w-12 h-12'>
+                                <img
+                                    src={elm.repository.owner.avatar_url}
+                                    alt='Owner Profile'
+                                    className='rounded-full'
+                                />
+                            </div>
+                            <span className='w-4/5 text-lg font-medium'>{elm.name}</span>
+                        </a>
                     ))}
                 </div>
             ) : null}
