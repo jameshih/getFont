@@ -116,11 +116,8 @@ export default function Home() {
                             <FontAwesomeIcon icon={faTimes} />
                         </span>
                     )}
-                    <span
-                        className='pl-8 ml-8 border-l-2 cursor-pointer'
-                        onClick={handleSearchClick}
-                    >
-                        <FontAwesomeIcon icon={faSearch} />
+                    <span className='pl-8 ml-8 border-l-2 cursor-pointer'>
+                        <FontAwesomeIcon icon={faSearch} onClick={handleSearchClick} />
                     </span>
                 </div>
             </div>
@@ -173,10 +170,12 @@ export default function Home() {
                                     className='rounded-full'
                                 />
                             </div>
-                            <span className='w-4/5 text-lg font-medium'>{elm.name}</span>
+                            <span className='w-4/5 text-lg font-medium break-words'>
+                                {elm.name}
+                            </span>
                         </a>
                     ))}
-                    <i className='block mt-8 text-sm text-center font-light'>
+                    <i className='block mt-8 text-sm font-light text-center'>
                         {'Dev by '}
                         <a href='https://jameshih.com' className='underline'>
                             James
